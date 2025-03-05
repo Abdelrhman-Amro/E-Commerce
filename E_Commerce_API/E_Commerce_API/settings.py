@@ -20,11 +20,8 @@ env = environ.Env(
     DEBUG=(bool, False)
 )
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-# Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
 
@@ -32,12 +29,10 @@ environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-# Raises Django's ImproperlyConfigured
-# exception if SECRET_KEY not in os.environ
 SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env("DEBUG")  # # False if not in os.environ because of casting above
+DEBUG = env("DEBUG")
 
 ALLOWED_HOSTS = []
 
@@ -51,6 +46,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
 ]
 
 MIDDLEWARE = [
@@ -83,15 +79,26 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "E_Commerce_API.wsgi.application"
 
-
+# print(env("SECRET_KEY"))
+# print(env("DB_NAME"))
+# print(env("PDB_PORT"))
+# print("hnnnnnnnnnnnnnnnnnn", BASE_DIR)
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": env("DB_NAME"),
+        "USER": env("DB_USER"),
+        "PASSWORD": env("DB_PASSWORD"),
+        "HOST": env("DB_HOST"),
+        "PORT": env("DB_PORT"),
     }
+    # "default": {
+    #     "ENGINE": "django.db.backends.sqlite3",
+    #     "NAME": BASE_DIR / "db.sqlite3",
+    # }
 }
 
 
