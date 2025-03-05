@@ -37,8 +37,8 @@ DEBUG = env("DEBUG")
 ALLOWED_HOSTS = []
 
 
-# Application definition
-
+############ Application definition ############
+# Dfault apps
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -46,8 +46,21 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+]
+
+# Third-party apps
+INSTALLED_APPS += [
     "rest_framework",
 ]
+
+# Custom apps
+INSTALLED_APPS += [
+    "users",
+    "products",
+    "cart",
+    "orders",
+]
+################################################
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -79,13 +92,8 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "E_Commerce_API.wsgi.application"
 
-# print(env("SECRET_KEY"))
-# print(env("DB_NAME"))
-# print(env("PDB_PORT"))
-# print("hnnnnnnnnnnnnnnnnnn", BASE_DIR)
-# Database
-# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+# https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
