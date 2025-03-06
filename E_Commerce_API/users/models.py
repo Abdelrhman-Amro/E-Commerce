@@ -46,7 +46,7 @@ class Seller(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     # Required fields
-    store_name = models.CharField(max_length=100, null=False, blank=False)
+    store_name = models.CharField(max_length=100, null=False, blank=False, unique=True)
     contact_email = models.EmailField(
         null=False, blank=False, unique=True, max_length=100
     )
