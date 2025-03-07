@@ -1,0 +1,877 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "My API",
+        "description": "API documentation",
+        "termsOfService": "https://www.example.com/terms/",
+        "contact": {
+            "email": "contact@example.com"
+        },
+        "license": {
+            "name": "MIT License"
+        },
+        "version": "v1"
+    },
+    "host": "127.0.0.1:8000",
+    "schemes": ["http"],
+    "basePath": "/api",
+    "consumes": ["application/json"],
+    "produces": ["application/json"],
+    "securityDefinitions": {
+        "Basic": {
+            "type": "basic"
+        }
+    },
+    "security": [
+        {
+            "Basic": []
+        }
+    ],
+    "paths": {
+        "/categories/": {
+            "get": {
+                "operationId": "categories_list",
+                "description": "Allow admin users to perform CRUD operations on categories.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Category"
+                            }
+                        }
+                    }
+                },
+                "tags": ["categories"]
+            },
+            "post": {
+                "operationId": "categories_create",
+                "description": "Allow admin users to perform CRUD operations on categories.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                },
+                "tags": ["categories"]
+            },
+            "parameters": []
+        },
+        "/categories/{category_id}/": {
+            "get": {
+                "operationId": "categories_read",
+                "description": "Allow admin users to perform CRUD operations on categories.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                },
+                "tags": ["categories"]
+            },
+            "put": {
+                "operationId": "categories_update",
+                "description": "Allow admin users to perform CRUD operations on categories.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                },
+                "tags": ["categories"]
+            },
+            "patch": {
+                "operationId": "categories_partial_update",
+                "description": "Allow admin users to perform CRUD operations on categories.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Category"
+                        }
+                    }
+                },
+                "tags": ["categories"]
+            },
+            "delete": {
+                "operationId": "categories_delete",
+                "description": "Allow admin users to perform CRUD operations on categories.",
+                "parameters": [],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                },
+                "tags": ["categories"]
+            },
+            "parameters": [
+                {
+                    "name": "category_id",
+                    "in": "path",
+                    "description": "A UUID string identifying this category.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/login/": {
+            "post": {
+                "operationId": "login_create",
+                "description": "Takes a set of user credentials and returns an access and refresh JSON web\ntoken pair to prove the authentication of those credentials.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenObtainPair"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/TokenObtainPair"
+                        }
+                    }
+                },
+                "tags": ["login"]
+            },
+            "parameters": []
+        },
+        "/logout/": {
+            "post": {
+                "operationId": "logout_create",
+                "description": "Logout a user by blacklisting their refresh token",
+                "parameters": [],
+                "responses": {
+                    "201": {
+                        "description": ""
+                    }
+                },
+                "tags": ["logout"]
+            },
+            "parameters": []
+        },
+        "/products/": {
+            "get": {
+                "operationId": "products_list",
+                "description": "Allow anyone to list all products.",
+                "parameters": [
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "A search term.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "ordering",
+                        "in": "query",
+                        "description": "Which field to use when ordering the results.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "A page number within the paginated result set.",
+                        "required": false,
+                        "type": "integer"
+                    },
+                    {
+                        "name": "page_size",
+                        "in": "query",
+                        "description": "Number of results to return per page.",
+                        "required": false,
+                        "type": "integer"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "required": ["count", "results"],
+                            "type": "object",
+                            "properties": {
+                                "count": {
+                                    "type": "integer"
+                                },
+                                "next": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "previous": {
+                                    "type": "string",
+                                    "format": "uri",
+                                    "x-nullable": true
+                                },
+                                "results": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/definitions/Product"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": ["products"]
+            },
+            "parameters": []
+        },
+        "/products/{product_id}/": {
+            "get": {
+                "operationId": "products_read",
+                "description": "Allow anyone to retrieve a single product.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                },
+                "tags": ["products"]
+            },
+            "parameters": [
+                {
+                    "name": "product_id",
+                    "in": "path",
+                    "description": "A UUID string identifying this product.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/refresh_token/": {
+            "post": {
+                "operationId": "refresh_token_create",
+                "description": "Takes a refresh type JSON web token and returns an access type JSON web\ntoken if the refresh token is valid.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/TokenRefresh"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/TokenRefresh"
+                        }
+                    }
+                },
+                "tags": ["refresh_token"]
+            },
+            "parameters": []
+        },
+        "/seller/products/": {
+            "get": {
+                "operationId": "seller_products_list",
+                "description": "Allow sellers to perform CRUD operations on their products.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Product"
+                            }
+                        }
+                    }
+                },
+                "tags": ["seller"]
+            },
+            "post": {
+                "operationId": "seller_products_create",
+                "description": "Allow sellers to perform CRUD operations on their products.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                },
+                "tags": ["seller"]
+            },
+            "parameters": []
+        },
+        "/seller/products/{product_id}/": {
+            "get": {
+                "operationId": "seller_products_read",
+                "description": "Allow sellers to perform CRUD operations on their products.",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                },
+                "tags": ["seller"]
+            },
+            "put": {
+                "operationId": "seller_products_update",
+                "description": "Allow sellers to perform CRUD operations on their products.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                },
+                "tags": ["seller"]
+            },
+            "patch": {
+                "operationId": "seller_products_partial_update",
+                "description": "Allow sellers to perform CRUD operations on their products.",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Product"
+                        }
+                    }
+                },
+                "tags": ["seller"]
+            },
+            "delete": {
+                "operationId": "seller_products_delete",
+                "description": "Allow sellers to perform CRUD operations on their products.",
+                "parameters": [],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                },
+                "tags": ["seller"]
+            },
+            "parameters": [
+                {
+                    "name": "product_id",
+                    "in": "path",
+                    "description": "A UUID string identifying this product.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/sellers/": {
+            "get": {
+                "operationId": "sellers_list",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Seller"
+                            }
+                        }
+                    }
+                },
+                "tags": ["sellers"]
+            },
+            "post": {
+                "operationId": "sellers_create",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                },
+                "tags": ["sellers"]
+            },
+            "parameters": []
+        },
+        "/sellers/{seller_id}/": {
+            "get": {
+                "operationId": "sellers_read",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                },
+                "tags": ["sellers"]
+            },
+            "put": {
+                "operationId": "sellers_update",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                },
+                "tags": ["sellers"]
+            },
+            "patch": {
+                "operationId": "sellers_partial_update",
+                "description": "",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/Seller"
+                        }
+                    }
+                },
+                "tags": ["sellers"]
+            },
+            "delete": {
+                "operationId": "sellers_delete",
+                "description": "",
+                "parameters": [],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                },
+                "tags": ["sellers"]
+            },
+            "parameters": [
+                {
+                    "name": "seller_id",
+                    "in": "path",
+                    "description": "A UUID string identifying this seller.",
+                    "required": true,
+                    "type": "string",
+                    "format": "uuid"
+                }
+            ]
+        },
+        "/user/": {
+            "get": {
+                "operationId": "user_read",
+                "description": "Authenticated users can retrieve, update or delete a user",
+                "parameters": [],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                },
+                "tags": ["user"]
+            },
+            "put": {
+                "operationId": "user_update",
+                "description": "Authenticated users can retrieve, update or delete a user",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                },
+                "tags": ["user"]
+            },
+            "patch": {
+                "operationId": "user_partial_update",
+                "description": "Authenticated users can retrieve, update or delete a user",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                },
+                "tags": ["user"]
+            },
+            "delete": {
+                "operationId": "user_delete",
+                "description": "Authenticated users can retrieve, update or delete a user",
+                "parameters": [],
+                "responses": {
+                    "204": {
+                        "description": ""
+                    }
+                },
+                "tags": ["user"]
+            },
+            "parameters": []
+        },
+        "/user/register/": {
+            "post": {
+                "operationId": "user_register_create",
+                "description": "Create a new user",
+                "parameters": [
+                    {
+                        "name": "data",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "",
+                        "schema": {
+                            "$ref": "#/definitions/CustomUser"
+                        }
+                    }
+                },
+                "tags": ["user"]
+            },
+            "parameters": []
+        }
+    },
+    "definitions": {
+        "Category": {
+            "required": ["name"],
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "title": "Category id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                }
+            }
+        },
+        "TokenObtainPair": {
+            "required": ["email", "password"],
+            "type": "object",
+            "properties": {
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "password": {
+                    "title": "Password",
+                    "type": "string",
+                    "minLength": 1
+                }
+            }
+        },
+        "Product": {
+            "required": ["name", "price", "seller_id", "category_id"],
+            "type": "object",
+            "properties": {
+                "product_id": {
+                    "title": "Product id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "name": {
+                    "title": "Name",
+                    "type": "string",
+                    "maxLength": 150,
+                    "minLength": 1
+                },
+                "description": {
+                    "title": "Description",
+                    "type": "string",
+                    "x-nullable": true
+                },
+                "price": {
+                    "title": "Price",
+                    "type": "string",
+                    "format": "decimal"
+                },
+                "stock_quantity": {
+                    "title": "Stock quantity",
+                    "type": "integer",
+                    "maximum": 2147483647,
+                    "minimum": -2147483648
+                },
+                "image_url": {
+                    "title": "Image url",
+                    "type": "string",
+                    "maxLength": 255,
+                    "x-nullable": true
+                },
+                "seller_id": {
+                    "title": "Seller id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "category_id": {
+                    "title": "Category id",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "category_name": {
+                    "title": "Category name",
+                    "type": "string",
+                    "readOnly": true
+                },
+                "created_at": {
+                    "title": "Created at",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                },
+                "updated_at": {
+                    "title": "Updated at",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            }
+        },
+        "TokenRefresh": {
+            "required": ["refresh"],
+            "type": "object",
+            "properties": {
+                "refresh": {
+                    "title": "Refresh",
+                    "type": "string",
+                    "minLength": 1
+                },
+                "access": {
+                    "title": "Access",
+                    "type": "string",
+                    "readOnly": true,
+                    "minLength": 1
+                }
+            }
+        },
+        "Seller": {
+            "required": ["store_name", "contact_email"],
+            "type": "object",
+            "properties": {
+                "seller_id": {
+                    "title": "Seller id",
+                    "type": "string",
+                    "format": "uuid",
+                    "readOnly": true
+                },
+                "store_name": {
+                    "title": "Store name",
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
+                "contact_email": {
+                    "title": "Contact email",
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
+                "description": {
+                    "title": "Description",
+                    "type": "string",
+                    "x-nullable": true
+                },
+                "contact_phone": {
+                    "title": "Contact phone",
+                    "type": "string",
+                    "maxLength": 20,
+                    "x-nullable": true
+                },
+                "address": {
+                    "title": "Address",
+                    "type": "string",
+                    "x-nullable": true
+                },
+                "created_at": {
+                    "title": "Created at",
+                    "type": "string",
+                    "format": "date-time",
+                    "readOnly": true
+                }
+            }
+        },
+        "CustomUser": {
+            "required": ["email", "username", "password"],
+            "type": "object",
+            "properties": {
+                "email": {
+                    "title": "Email",
+                    "type": "string",
+                    "format": "email",
+                    "maxLength": 254,
+                    "minLength": 1
+                },
+                "username": {
+                    "title": "Username",
+                    "type": "string",
+                    "maxLength": 50,
+                    "minLength": 1
+                },
+                "password": {
+                    "title": "Password",
+                    "type": "string",
+                    "maxLength": 128,
+                    "minLength": 1
+                },
+                "first_name": {
+                    "title": "First name",
+                    "type": "string",
+                    "maxLength": 150
+                },
+                "last_name": {
+                    "title": "Last name",
+                    "type": "string",
+                    "maxLength": 150
+                },
+                "role": {
+                    "title": "Role",
+                    "type": "string",
+                    "enum": ["seller", "buyer"]
+                }
+            }
+        }
+    }
+}
