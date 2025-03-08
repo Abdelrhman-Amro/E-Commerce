@@ -54,6 +54,7 @@ INSTALLED_APPS += [
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
     "drf_yasg",
+    "corsheaders",
 ]
 
 # Custom apps
@@ -87,6 +88,8 @@ SIMPLE_JWT = {
 ################################################
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",  # Place it at the top
+    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -95,6 +98,15 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+# Allow specific origins (for development)
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+#     "http://127.0.0.1:3000",
+# ]
+
+# OR allow all origins (temporary for testing)
+# CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "E_Commerce_API.urls"
 
