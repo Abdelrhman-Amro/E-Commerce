@@ -34,7 +34,8 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env("DEBUG")
 
-ALLOWED_HOSTS = []
+# Get ALLOWED_HOSTS as a list
+ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[])
 
 
 ############ Application definition ############
@@ -119,7 +120,7 @@ WSGI_APPLICATION = "E_Commerce_API.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 DATABASES = {
     # "default": {
-    #     "ENGINE": "django.db.backends.postgresql",
+    #     "ENGINE": env("DB_ENGINE"),
     #     "NAME": env("DB_NAME"),
     #     "USER": env("DB_USER"),
     #     "PASSWORD": env("DB_PASSWORD"),
@@ -168,6 +169,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = "staticfiles"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
