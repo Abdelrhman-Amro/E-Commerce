@@ -22,7 +22,7 @@ env = environ.Env(
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+environ.Env.read_env(os.path.join(BASE_DIR, ".env.dev"))
 
 
 # Quick-start development settings - unsuitable for production
@@ -88,10 +88,9 @@ SIMPLE_JWT = {
 ################################################
 
 MIDDLEWARE = [
-    "corsheaders.middleware.CorsMiddleware",  # Place it at the top
-    "django.middleware.common.CommonMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -100,10 +99,7 @@ MIDDLEWARE = [
 ]
 
 # Allow specific origins (for development)
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-#     "http://127.0.0.1:3000",
-# ]
+CORS_ALLOWED_ORIGINS = []
 
 # OR allow all origins (temporary for testing)
 # CORS_ALLOW_ALL_ORIGINS = True
