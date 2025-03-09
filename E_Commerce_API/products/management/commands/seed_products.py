@@ -1,40 +1,63 @@
 from django.core.management.base import BaseCommand
-from products.models import Category, Product
-from users.models import Seller
+from products.models import Category, Product, Review
+from users.models import CustomUser, Seller
 
 
 class Command(BaseCommand):
     help = "Seed the database with initial product data"
 
     def handle(self, *args, **kwargs):
-        # Create categories
-        category1 = Category.objects.create(name="Electronics")
-        category2 = Category.objects.create(name="Books")
 
-        # Get seller
-        seller = Seller.objects.first()
+        catgories = []
+        for i in range(8):
+            catgories.append(
+                {
+                    "name": f"Category-{i}",
+                }
+            )
+        Category.objects.bulk_create(Category(**category) for category in catgories)
 
-        # Create products
-        Product.objects.create(
-            name="Smartphone",
-            price=699.99,
-            stock_quantity=50,
-            category_id=category1,
-            seller_id=seller,
-        )
-        Product.objects.create(
-            name="Laptop",
-            price=999.99,
-            stock_quantity=30,
-            category_id=category1,
-            seller_id=seller,
-        )
-        Product.objects.create(
-            name="Fiction Book",
-            price=19.99,
-            stock_quantity=100,
-            category_id=category2,
-            seller_id=seller,
-        )
+        sellers_objs = Seller.objects.all()
+        categories_objs = Category.objects.all()
+        print(sellers_objs.count())
+        products = []
+        for i in range(100):
+            # seller1[20], seller2[20], seller3[20], seller4[20], seller5[20]
+            products.append(
+                {
+                    "name": f"Product-{i}",
+                    "price": 100.00,
+                    "stock_quantity": 100,
+                    "seller_id": sellers_objs[
+                        ((i // 20) % 5)
+                    ],  # ((start / group) % range)
+                    "category_id": categories_objs[i % 8],
+                }
+            )
+
+        Product.objects.bulk_create(Product(**product) for product in products)
+
+        reviews = []
+        buyers_objs = CustomUser.objects.filter(role="buyer")
+        products = Product.objects.all()
+        for i in range(100):
+            reviews.append(
+                {
+                    "rating": 5,
+                    "comment": "Good",
+                    "product": products[i],
+                    "reviewer": buyers_objs[i % 10],
+                }
+            )
+        for i in range(99):
+            reviews.append(
+                {
+                    "rating": 2,
+                    "comment": "Bad",
+                    "product": products[i + 1],
+                    "reviewer": buyers_objs[i % 10],
+                }
+            )
+        Review.objects.bulk_create(Review(**review) for review in reviews)
 
         self.stdout.write(self.style.SUCCESS("Successfully seeded the database"))

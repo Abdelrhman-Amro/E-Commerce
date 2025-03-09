@@ -1,12 +1,15 @@
 import uuid
 
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 
 
 class Category(models.Model):
     category_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     name = models.CharField(max_length=100, unique=True, null=False)
+    category_image_url = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -42,3 +45,56 @@ class Product(models.Model):
                 name="stock_quantity_gte_0",
             ),
         ]
+
+
+class Review(models.Model):
+    # Default fields
+    review_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Relationships
+    product = models.ForeignKey(
+        "Product", on_delete=models.CASCADE, related_name="reviews"
+    )
+    reviewer = models.ForeignKey(
+        "users.CustomUser", on_delete=models.CASCADE, related_name="reviews"
+    )
+
+    # Required fields
+    rating = models.PositiveIntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)]
+    )
+
+    # Optional fields
+    comment = models.TextField(null=True, blank=True)
+
+    # is_verified_purchase = models.BooleanField(
+    #     default=False, help_text="Indicates if reviewer purchased the product"
+    # )
+
+    def __str__(self):
+        return f"{self.product.name} ({self.rating} stars)"
+
+    class Meta:
+        # Ensure one review per user per product
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "reviewer"], name="unique_product_reviewer"
+            )
+        ]
+        # Default ordering for queries
+        ordering = ["-created_at"]
+
+        # Improve query performance
+        #     indexes = [
+        #         models.Index(fields=["product", "rating"]),
+        #         models.Index(fields=["reviewer"]),
+        #     ]
+
+        # # Optional: Custom validation
+        # def clean(self):
+        #     """Additional validation if needed"""
+        #     super().clean()
+        #     if self.rating < 1 or self.rating > 5:
+        #         raise ValidationError("Rating must be between 1 and 5")

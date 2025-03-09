@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Category, Product
+from .models import Category, Product, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -11,7 +11,7 @@ class CategorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Category
-        fields = ["category_id", "name"]
+        fields = ["category_id", "name", "category_image_url"]
         read_only_fields = ["category_id"]
 
 
@@ -60,33 +60,80 @@ class ProductSerializer(serializers.ModelSerializer):
         return value
 
 
-class ProductListSerializer(ProductSerializer):
+class ReviewSerializer(serializers.ModelSerializer):
     """
-    Simplified serializer for listing products,
-    with fewer fields for better performance.
-    """
-
-    class Meta(ProductSerializer.Meta):
-        fields = ["product_id", "name", "price", "image_url", "category_name"]
-
-
-class ProductDetailSerializer(ProductSerializer):
-    """
-    Detailed serializer for retrieving a single product.
-    Includes additional information about the seller.
+    Serializer for Review model providing full detail representation
+    Handles CRUD operations for reviews with validations
     """
 
-    seller = serializers.SerializerMethodField()
+    reviewer_username = serializers.CharField(
+        source="reviewer.username", read_only=True
+    )
 
-    class Meta(ProductSerializer.Meta):
-        # Include all fields from the parent plus the seller info
-        pass
+    class Meta:
+        model = Review
+        fields = [
+            "review_id",
+            "product",
+            "reviewer",
+            "reviewer_username",
+            "rating",
+            "comment",
+            "created_at",
+            "updated_at",
+        ]
+        read_only_fields = [
+            "review_id",
+            "reviewer",
+            "created_at",
+            "updated_at",
+            "reviewer_username",
+        ]
 
-    def get_seller(self, obj):
+    def validate_rating(self, value):
         """
-        Get the seller's store name and contact details.
+        Validate that rating is between 1 and 5
         """
-        return {
-            "store_name": obj.seller_id.store_name,
-            "contact_email": obj.seller_id.contact_email,
-        }
+        if value < 1 or value > 5:
+            raise serializers.ValidationError("Rating must be between 1 and 5")
+        return value
+
+    # def validate(self, data):
+    #     """
+    #     Check if user has already reviewed this product
+    #     """
+    #     if self.context["request"].method == "POST":
+    #         reviewer = data.get("reviewer")
+    #         product = data.get("product")
+
+    #     # # Seller can't review his product
+    #     # if hasattr(product, "seller_id") and product.seller_id == reviewer:
+    #     #     raise serializers.ValidationError("You cannot review your own product")
+
+    #     # Can't review same product twice
+    #     if Review.objects.filter(reviewer=reviewer, product=product).exists():
+    #         raise serializers.ValidationError("You have already reviewed this product")
+    #     return data
+
+
+class ReviewListSerializer(serializers.ModelSerializer):
+    """
+    Serializer optimized for listing reviews
+    Reduces payload size for better performance
+    """
+
+    reviewer_username = serializers.CharField(
+        source="reviewer.username", read_only=True
+    )
+    product_name = serializers.CharField(source="product.name", read_only=True)
+
+    class Meta:
+        model = Review
+        fields = [
+            "review_id",
+            "product_name",
+            "reviewer_username",
+            "rating",
+            "comment",
+            "created_at",
+        ]

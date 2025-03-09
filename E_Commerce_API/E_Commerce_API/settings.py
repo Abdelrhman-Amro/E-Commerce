@@ -99,10 +99,10 @@ MIDDLEWARE = [
 ]
 
 # Allow specific origins (for development)
-CORS_ALLOWED_ORIGINS = []
+# CORS_ALLOWED_ORIGINS = []
 
 # OR allow all origins (temporary for testing)
-# CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = "E_Commerce_API.urls"
 

@@ -7,9 +7,14 @@ from users.models import Seller
 from users.permissions import IsSeller
 
 from .filters import ProductFilter
-from .models import Category, Product
+from .models import Category, Product, Review
 from .pagination import ProductPagination
-from .serializers import CategorySerializer, ProductSerializer
+from .serializers import (
+    CategorySerializer,
+    ProductSerializer,
+    ReviewListSerializer,
+    ReviewSerializer,
+)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -64,3 +69,17 @@ class ProductRetrieveView(RetrieveAPIView):
     serializer_class = ProductSerializer
     permission_classes = [AllowAny]
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return ReviewListSerializer
+
+        return ReviewSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(reviewer=self.request.user)

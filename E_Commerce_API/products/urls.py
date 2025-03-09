@@ -6,12 +6,14 @@ from .views import (
     CategoryViewSet,
     ProductListView,
     ProductRetrieveView,
+    ReviewViewSet,
     SellerProductViewSet,
 )
 
 router = routers.DefaultRouter()
 router.register(r"categories", CategoryViewSet)
 router.register(r"seller/products", SellerProductViewSet)
+router.register(r"reviews", ReviewViewSet)
 
 urlpatterns = [
     path("", include(router.urls)),

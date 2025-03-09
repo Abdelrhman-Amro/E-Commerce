@@ -6,25 +6,34 @@ class Command(BaseCommand):
     help = "Seed the database with initial user data"
 
     def handle(self, *args, **kwargs):
-        # Create users
-        user1 = CustomUser.objects.create_user(
-            email="buyer1@example.com",
-            username="buyer1",
-            password="password123",
-            role="buyer",
-        )
-        user2 = CustomUser.objects.create_user(
-            email="seller1@example.com",
-            username="seller1",
-            password="password123",
-            role="seller",
-        )
+        data = []
+        for i in range(10):
+            data.append(
+                {
+                    "email": f"buyer{i}@example.com",
+                    "username": f"buyer{i}",
+                    "password": "testgg44",
+                    "role": "buyer",
+                }
+            )
+        CustomUser.objects.bulk_create(CustomUser(**user) for user in data)
 
-        # Create seller
-        Seller.objects.create(
-            user_id=user2,
-            store_name="Seller One Store",
-            contact_email="contact@seller1store.com",
-        )
+        # fix password
+        for user in CustomUser.objects.all():
+            user.set_password(user.password)
+            user.save()
+
+        data = []
+        CustomUsers = CustomUser.objects.all()
+
+        for i in range(5):
+            data.append(
+                {
+                    "store_name": f"store{i}",
+                    "contact_email": f"store{i}@example.com",
+                    "user_id": CustomUsers[i],
+                }
+            )
+        Seller.objects.bulk_create(Seller(**user) for user in data)
 
         self.stdout.write(self.style.SUCCESS("Successfully seeded the database"))
