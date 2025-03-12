@@ -6,13 +6,20 @@ from django.db.models import Q
 
 
 class Category(models.Model):
+    # Default fields
     category_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
 
-    name = models.CharField(max_length=100, unique=True, null=False)
-    category_image_url = models.CharField(max_length=255, null=True, blank=True)
+    # Required fields
+    name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        db_table = "category"
+        verbose_name = "category"
+        verbose_name_plural = "categories"
 
 
 class Product(models.Model):
@@ -22,28 +29,33 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Relationships
-    seller_id = models.ForeignKey("users.Seller", on_delete=models.CASCADE)
+    store_id = models.ForeignKey("users.Store", on_delete=models.CASCADE)
     category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
 
     # Required fields
     name = models.CharField(max_length=150, unique=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    stock_quantity = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
+    stock_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(9999)])
 
     # Optional fields
-    description = models.TextField(null=True, blank=True)
-    image_url = models.CharField(max_length=255, null=True, blank=True)
+    description = models.TextField(blank=True)
+    image_url = models.CharField(max_length=255, blank=True)
 
     def __str__(self):
         return self.name
 
     class Meta:
+        db_table = "product"
+        verbose_name = "product"
+        verbose_name_plural = "products"
         constraints = [
             models.CheckConstraint(check=models.Q(price__gt=0), name="price_gt_0"),
-            models.CheckConstraint(
-                check=Q(stock_quantity__gte=0) & Q(stock_quantity__lte=9999),
-                name="stock_quantity_gte_0",
-            ),
+            models.CheckConstraint(check=Q(stock_quantity__gte=0) & Q(stock_quantity__lte=9999), name="stock_quantity_gte_0"),
+        ]
+        indexes = [
+            models.Index(fields=["name"]),
+            models.Index(fields=["store_id"]),
+            models.Index(fields=["category_id"]),
         ]
 
 
@@ -54,47 +66,32 @@ class Review(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Relationships
-    product = models.ForeignKey(
-        "Product", on_delete=models.CASCADE, related_name="reviews"
-    )
-    reviewer = models.ForeignKey(
-        "users.CustomUser", on_delete=models.CASCADE, related_name="reviews"
-    )
+    product = models.ForeignKey("Product", on_delete=models.CASCADE, related_name="product_reviews")
+    reviewer = models.ForeignKey("users.CustomUser", on_delete=models.CASCADE, related_name="user_reviews")
 
     # Required fields
-    rating = models.PositiveIntegerField(
-        validators=[MinValueValidator(1), MaxValueValidator(5)]
-    )
+    rating = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
 
     # Optional fields
-    comment = models.TextField(null=True, blank=True)
-
-    # is_verified_purchase = models.BooleanField(
-    #     default=False, help_text="Indicates if reviewer purchased the product"
-    # )
+    comment_title = models.CharField(max_length=50, blank=True)
+    comment = models.TextField(blank=True)
+    is_verified_purchase = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.product.name} ({self.rating} stars)"
 
     class Meta:
-        # Ensure one review per user per product
-        constraints = [
-            models.UniqueConstraint(
-                fields=["product", "reviewer"], name="unique_product_reviewer"
-            )
+        db_table = "review"
+        verbose_name = "review"
+        verbose_name_plural = "reviews"
+
+        unique_together = [("product", "reviewer")]  # Ensure a user can only review a product once
+        ordering = ["-created_at"]  # Default ordering for queries
+        indexes = [
+            models.Index(fields=["product", "rating"]),
+            models.Index(fields=["is_verified_purchase"]),
+            models.Index(fields=["reviewer"]),
         ]
-        # Default ordering for queries
-        ordering = ["-created_at"]
-
-        # Improve query performance
-        #     indexes = [
-        #         models.Index(fields=["product", "rating"]),
-        #         models.Index(fields=["reviewer"]),
-        #     ]
-
-        # # Optional: Custom validation
-        # def clean(self):
-        #     """Additional validation if needed"""
-        #     super().clean()
-        #     if self.rating < 1 or self.rating > 5:
-        #         raise ValidationError("Rating must be between 1 and 5")
+        constraints = [
+            models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5), name="rating_range_1_to_5"),
+        ]

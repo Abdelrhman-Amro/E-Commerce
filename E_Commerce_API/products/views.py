@@ -1,85 +1,85 @@
-from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
-from rest_framework.filters import OrderingFilter, SearchFilter
-from rest_framework.generics import ListAPIView, RetrieveAPIView
-from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
-from users.models import Seller
-from users.permissions import IsSeller
+# from django_filters.rest_framework import DjangoFilterBackend
+# from rest_framework import viewsets
+# from rest_framework.filters import OrderingFilter, SearchFilter
+# from rest_framework.generics import ListAPIView, RetrieveAPIView
+# from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+# from users.models import Seller
+# from users.permissions import IsSeller
 
-from .filters import ProductFilter
-from .models import Category, Product, Review
-from .pagination import ProductPagination
-from .serializers import (
-    CategorySerializer,
-    ProductSerializer,
-    ReviewListSerializer,
-    ReviewSerializer,
-)
-
-
-class CategoryViewSet(viewsets.ModelViewSet):
-    """
-    Allow admin users to perform CRUD operations on categories.
-    """
-
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
-
-    def get_permissions(self):
-        if self.action in ["list", "retrieve"]:
-            return [AllowAny()]
-        return [IsAdminUser()]
+# from .filters import ProductFilter
+# from .models import Category, Product, Review
+# from .pagination import ProductPagination
+# from .serializers import (
+#     CategorySerializer,
+#     ProductSerializer,
+#     ReviewListSerializer,
+#     ReviewSerializer,
+# )
 
 
-class SellerProductViewSet(viewsets.ModelViewSet):
-    """
-    Allow sellers to perform CRUD operations on their products.
-    """
+# class CategoryViewSet(viewsets.ModelViewSet):
+#     """
+#     Allow admin users to perform CRUD operations on categories.
+#     """
 
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [IsAuthenticated, IsSeller]
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
 
-    def get_queryset(self):
-        seller_id = Seller.objects.get(user_id=self.request.user)
-        return self.queryset.filter(seller_id=seller_id)
-
-
-class ProductListView(ListAPIView):
-    """
-    Allow anyone to list all products.
-    """
-
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    filterset_class = ProductFilter
-    search_fields = ["name", "description"]
-    ordering_fields = ["price", "created_at"]
-    pagination_class = ProductPagination
+#     def get_permissions(self):
+#         if self.action in ["list", "retrieve"]:
+#             return [AllowAny()]
+#         return [IsAdminUser()]
 
 
-class ProductRetrieveView(RetrieveAPIView):
-    """
-    Allow anyone to retrieve a single product.
-    """
+# class SellerProductViewSet(viewsets.ModelViewSet):
+#     """
+#     Allow sellers to perform CRUD operations on their products.
+#     """
 
-    queryset = Product.objects.all()
-    serializer_class = ProductSerializer
-    permission_classes = [AllowAny]
-    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     permission_classes = [IsAuthenticated, IsSeller]
+
+#     def get_queryset(self):
+#         seller_id = Seller.objects.get(user_id=self.request.user)
+#         return self.queryset.filter(seller_id=seller_id)
 
 
-class ReviewViewSet(viewsets.ModelViewSet):
-    queryset = Review.objects.all()
-    permission_classes = [IsAuthenticated]
+# class ProductListView(ListAPIView):
+#     """
+#     Allow anyone to list all products.
+#     """
 
-    def get_serializer_class(self):
-        if self.action == "list":
-            return ReviewListSerializer
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     permission_classes = [AllowAny]
+#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+#     filterset_class = ProductFilter
+#     search_fields = ["name", "description"]
+#     ordering_fields = ["price", "created_at"]
+#     pagination_class = ProductPagination
 
-        return ReviewSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(reviewer=self.request.user)
+# class ProductRetrieveView(RetrieveAPIView):
+#     """
+#     Allow anyone to retrieve a single product.
+#     """
+
+#     queryset = Product.objects.all()
+#     serializer_class = ProductSerializer
+#     permission_classes = [AllowAny]
+#     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+
+
+# class ReviewViewSet(viewsets.ModelViewSet):
+#     queryset = Review.objects.all()
+#     permission_classes = [IsAuthenticated]
+
+#     def get_serializer_class(self):
+#         if self.action == "list":
+#             return ReviewListSerializer
+
+#         return ReviewSerializer
+
+#     def perform_create(self, serializer):
+#         serializer.save(reviewer=self.request.user)

@@ -1,6 +1,7 @@
 import uuid
 
 from django.contrib.auth.models import AbstractUser
+from django.core.exceptions import ValidationError
 from django.db import models
 
 
@@ -8,63 +9,104 @@ class CustomUser(AbstractUser):
     # role choices
     class Role(models.TextChoices):
         SELLER = "seller", "Seller"
-        BUYER = "buyer", "Buyer"
+        CUSTOMER = "customer", "Customer"
 
-    # override fields
-    user_id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False, unique=True
-    )
-    email = models.EmailField(unique=True, null=False, blank=False)
-    username = models.CharField(max_length=50, unique=True, null=False, blank=False)
+    # Override fields
+    user_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
+    email = models.EmailField(unique=True)
+    username = models.CharField(max_length=50, unique=True)
 
-    # extra fields
-    role = models.CharField(
-        max_length=10,
-        choices=Role.choices,
-        default=Role.BUYER,
-        null=False,
-        blank=False,
-    )
+    # Extra fields
+    role = models.CharField(max_length=10, choices=Role.choices, default=Role.CUSTOMER)
 
-    # field used for authentication
+    # Authentication fields
     USERNAME_FIELD = "email"
-
-    # required fields for creating a user
     REQUIRED_FIELDS = ["username", "role"]
 
     def __str__(self):
-        return self.username
+        return f"{self.username} ({self.email})"
 
     class Meta:
         db_table = "customuser"
         verbose_name = "customuser"
         verbose_name_plural = "customusers"
+        indexes = [
+            models.Index(fields=["email"]),
+            models.Index(fields=["username"]),
+        ]
 
 
-class Seller(models.Model):
-    seller_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+class Store(models.Model):
+    # Default fields
+    store_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Relationships
+    user_id = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="store")
 
     # Required fields
-    store_name = models.CharField(max_length=100, null=False, blank=False, unique=True)
-    contact_email = models.EmailField(
-        null=False, blank=False, unique=True, max_length=100
-    )
+    store_name = models.CharField(max_length=100, unique=True)
 
     # Optional fields
     description = models.TextField(null=True, blank=True)
-    contact_phone = models.CharField(max_length=20, null=True, blank=True)
-    address = models.TextField(null=True, blank=True)
-
-    # Relationships
-    user_id = models.OneToOneField(
-        CustomUser, on_delete=models.CASCADE, related_name="seller"
-    )
 
     def __str__(self):
         return self.store_name
 
     class Meta:
-        db_table = "seller"
-        verbose_name = "seller"
-        verbose_name_plural = "sellers"
+        db_table = "store"
+        verbose_name = "store"
+        verbose_name_plural = "stores"
+        indexes = [
+            models.Index(fields=["store_name"]),
+        ]
+
+
+class Address(models.Model):
+
+    # Default fields
+    address_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    # Relationships
+    # Both can be null as an address might belong to either a user or market
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="addresses", null=True, blank=True)
+    market = models.OneToOneField(Store, on_delete=models.CASCADE, related_name="addresses", null=True, blank=True)
+
+    # Required fields
+    street_address = models.CharField(max_length=255)
+    country = models.CharField(max_length=100)
+    city = models.CharField(max_length=100)
+
+    # Optional fields
+    special_mark = models.CharField(max_length=255, blank=True)
+    state = models.CharField(max_length=100, blank=True)
+    postal_code = models.CharField(max_length=20, blank=True)
+
+    def __str__(self):
+        return f"{self.country}, {self.city}, {self.street_address}"
+
+    def clean(self):
+        """
+        Ensure that either user or market is set
+        """
+        if self.user is None and self.market is None:
+            raise ValidationError("Address must belong to either a user or a market")
+
+    def save(self, *args, **kwargs):
+        """
+        Ensure cleaning before saving
+        """
+        self.clean()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = "address"
+        verbose_name = "address"
+        verbose_name_plural = "addresses"
+        indexes = [
+            models.Index(fields=["user"]),
+            models.Index(fields=["market"]),
+        ]
