@@ -46,6 +46,7 @@ INSTALLED_APPS += [
     "orders",
 ]
 ##################################################
+AUTH_USER_MODEL = "users.CustomUser"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
@@ -56,8 +57,6 @@ REST_FRAMEWORK = {
 
 ########## Authentication settings (JWT) ##########
 from datetime import timedelta
-
-AUTH_USER_MODEL = "users.CustomUser"
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=15),
