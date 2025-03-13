@@ -12,7 +12,7 @@ def update_user_role_to_seller(sender, instance, created, **kwargs):
     """
 
     if created:
-        user = instance.user_id
+        user = instance.user
         if user.role != "seller":
             user.role = "seller"
             user.save()
@@ -24,7 +24,7 @@ def update_user_role_to_buyer(sender, instance, **kwargs):
     After delete store, update user role to buyer
     """
 
-    user = instance.user_id
+    user = instance.user
     if user.role == "seller":
         user.role = "buyer"
         user.save()

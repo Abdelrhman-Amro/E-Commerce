@@ -21,7 +21,7 @@ class CustomUserAdmin(UserAdmin):
 
 class StoreAdmin(admin.ModelAdmin):
     readonly_fields = ("store_id", "created_at", "updated_at")
-    list_display = ("store_name", "user_id__username", "created_at")
+    list_display = ("store_name", "user__username", "created_at")
     search_fields = ("store_name", "description")
     ordering = ("store_name", "created_at")
 
