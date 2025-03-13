@@ -32,14 +32,12 @@ class Command(BaseCommand):
                 password="testgg44",
                 role=role,
             )
-            user.set_password(user.password)
-            user.save()
             self.stdout.write(self.style.SUCCESS(f"Created {role}: {user.username}"))
 
         # Create 3 stores, one for each seller
         for i in range(1, 4):
             seller = CustomUser.objects.get(username=f"user{i}")
-            store = Store.objects.create(user_id=seller, store_name=f"Store {i}")
+            store = Store.objects.create(user=seller, store_name=f"Store {i}")
             self.stdout.write(self.style.SUCCESS(f"Created store: {store.store_name}"))
 
         # Create 7 addresses for customers

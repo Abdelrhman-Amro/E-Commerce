@@ -11,10 +11,12 @@ class IsSeller(BasePermission):
         return request.user.role == "seller"
 
 
-class IsMarketOwner(BasePermission):
+class IsStoreOwner(BasePermission):
     """
-    Check if the user is the owner of the market.
+    Check if the user is the owner of the store.
     """
 
     def has_object_permission(self, request, view, obj):
-        return obj.user_id == request.user
+        print(obj.user)
+        print(request.user)
+        return obj.user == request.user

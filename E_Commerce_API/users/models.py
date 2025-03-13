@@ -43,7 +43,7 @@ class Store(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Relationships
-    user_id = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="store")
+    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name="store")
 
     # Required fields
     store_name = models.CharField(max_length=100, unique=True)

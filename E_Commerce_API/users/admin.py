@@ -20,14 +20,14 @@ class CustomUserAdmin(UserAdmin):
 
 
 class StoreAdmin(admin.ModelAdmin):
-    readonly_fields = ("store_id", "user_id", "created_at", "updated_at")
+    readonly_fields = ("store_id", "created_at", "updated_at")
     list_display = ("store_name", "user_id__username", "created_at")
     search_fields = ("store_name", "description")
     ordering = ("store_name", "created_at")
 
 
 class AddressAdmin(admin.ModelAdmin):
-    readonly_fields = ("address_id", "user", "store", "created_at", "updated_at")
+    readonly_fields = ("address_id", "created_at", "updated_at")
     list_display = ("country", "city", "street_address", "user__username", "store__store_name", "created_at")
     list_filter = ("country", "city")
     search_fields = ("country", "city", "street_address")
