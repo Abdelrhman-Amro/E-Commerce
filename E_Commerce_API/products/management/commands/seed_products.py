@@ -4,6 +4,16 @@ from users.models import CustomUser, Seller
 
 
 class Command(BaseCommand):
+    """
+    create 5 categoreis
+
+    create 9 products 3 for each store
+    create 3 products 1 for each store without category
+
+    create 10 reviewes 2 by each customer
+    create 6 reviewes 2 by each seller
+    """
+
     help = "Seed the database with initial product data"
 
     def handle(self, *args, **kwargs):
@@ -28,9 +38,7 @@ class Command(BaseCommand):
                     "name": f"Product-{i}",
                     "price": 100.00,
                     "stock_quantity": 100,
-                    "seller_id": sellers_objs[
-                        ((i // 20) % 5)
-                    ],  # ((start / group) % range)
+                    "seller_id": sellers_objs[((i // 20) % 5)],  # ((start / group) % range)
                     "category_id": categories_objs[i % 8],
                 }
             )

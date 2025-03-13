@@ -30,7 +30,7 @@ class Product(models.Model):
 
     # Relationships
     store_id = models.ForeignKey("users.Store", on_delete=models.CASCADE)
-    category_id = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category_id = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True)
 
     # Required fields
     name = models.CharField(max_length=150, unique=True)

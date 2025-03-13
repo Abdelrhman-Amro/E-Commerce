@@ -71,9 +71,9 @@ class Address(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Relationships
-    # Both can be null as an address might belong to either a user or market
+    # Both can be null as an address might belong to either a user or store
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="addresses", null=True, blank=True)
-    market = models.OneToOneField(Store, on_delete=models.CASCADE, related_name="addresses", null=True, blank=True)
+    store = models.OneToOneField(Store, on_delete=models.CASCADE, related_name="addresses", null=True, blank=True)
 
     # Required fields
     street_address = models.CharField(max_length=255)
@@ -90,10 +90,10 @@ class Address(models.Model):
 
     def clean(self):
         """
-        Ensure that either user or market is set
+        Ensure that either user or store is set
         """
-        if self.user is None and self.market is None:
-            raise ValidationError("Address must belong to either a user or a market")
+        if self.user is None and self.store is None:
+            raise ValidationError("Address must set at least to user or store")
 
     def save(self, *args, **kwargs):
         """
@@ -108,5 +108,5 @@ class Address(models.Model):
         verbose_name_plural = "addresses"
         indexes = [
             models.Index(fields=["user"]),
-            models.Index(fields=["market"]),
+            models.Index(fields=["store"]),
         ]
