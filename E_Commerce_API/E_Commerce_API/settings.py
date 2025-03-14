@@ -187,3 +187,7 @@ STATIC_ROOT = "staticfiles"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# note: Set to False to remove trailing slashes from URLs
+# note: And if it is exists cause NotFound rather than InternalServerError
+APPEND_SLASH = False

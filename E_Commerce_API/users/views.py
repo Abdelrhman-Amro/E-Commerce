@@ -140,15 +140,6 @@ class AddressViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 
-# class StroreAdressRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-#     serializer_class = StoreSerializer
-#     permission_classes = [IsAuthenticated, IsStoreOwner]
-
-#     def get_object(self):
-
-#         return store_address
-
-
 class StoreAddressViewSet(viewsets.ModelViewSet):
     """
     -   Anyone:
@@ -179,6 +170,8 @@ class StoreAddressViewSet(viewsets.ModelViewSet):
         """
         store = Store.objects.get(user=self.request.user)
         address = Address.objects.get(store=store)
+
+        # Check if the store already has an address
         if address:
             raise serializers.ValidationError("Store already has an address.")
         else:

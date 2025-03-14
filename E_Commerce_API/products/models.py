@@ -34,10 +34,11 @@ class Product(models.Model):
 
     # Required fields
     name = models.CharField(max_length=150, unique=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
+    price = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(1.00)])
     stock_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0), MaxValueValidator(9999)])
 
     # Optional fields
+    quick_overview = models.CharField(max_length=255, blank=True)
     description = models.TextField(blank=True)
     image_url = models.CharField(max_length=255, blank=True)
 

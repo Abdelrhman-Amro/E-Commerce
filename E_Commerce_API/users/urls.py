@@ -17,6 +17,11 @@ router.register(r"store/addresses", StoreAddressViewSet, basename="store-address
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("store/", StoreRetriveAuthView.as_view(), name="store-retrieve-auth"),
+]
+
+# user management
+urlpatterns += [
     path("user/register/", UserRegisterView.as_view(), name="user-register"),
     path("user/", UserRetrieveUpdateDestroyView.as_view(), name="user-retrieve-update-destroy"),
 ]
