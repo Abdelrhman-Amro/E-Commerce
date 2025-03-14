@@ -32,7 +32,7 @@
 
 ---
 
-#### Stores
+### Stores
 
 -   Anyone:
     -   LIST stores
@@ -57,7 +57,7 @@
 
 ---
 
-#### Addresses
+### Addresses
 
 -   Anyone:
     -   RETRIEVE/LIST stores addresses
@@ -85,7 +85,7 @@
 
 ## Products-Level
 
-#### Categories
+### Categories
 
 **Permissions**
 
@@ -107,7 +107,7 @@
 
 ---
 
-#### Products
+### Products
 
 -   **permissions:**
     -   `Vendor`
@@ -139,7 +139,7 @@
 -   Search
 -   Pagination applied on Products and Categories
 
-#### Reviews
+### Reviews
 
 -   **permissions:**
     -   `Customer`
@@ -235,6 +235,32 @@
 
 # Overall Technical Overview
 
+## End-Points List
+
+## End-Points Features
+
+### Filtering/Sorting/Searching
+
+-   Categories
+    -   Alphabetical Order
+
+## Authentication/Authorization
+
+-   Use basic setup of jwt
+-   Setup permessions for each role
+    -   Any - Buier - Seller - Admin
+
+## Exceptions & Validations
+
+> Enure Consistency, Integrity ...
+
+-   Model level vlidations
+    -   Secure DB level
+-   Serializer level validations
+    -   Check valid data before go to db
+-   Create Endpoints exceptions
+    -   Permissions
+
 ## Email Services
 
 -   Verify email before creating
@@ -243,14 +269,17 @@
 -   Shipping mail
     -   When order is shipped
 
-## End-Points List
+## Signals
 
-## Filte/Sort/Search Features
+## Caching
 
--   Categories
-    -   Alphabetical Order
+## Throttling
 
-## Pagination
+## Scripts Utils
+
+## Payment Integrations
+
+## Deployment solutions
 
 ## seed-strategy
 
@@ -279,30 +308,7 @@ create 10 reviewes 2 by each customer
 create 6 reviewes 2 by each seller
 ```
 
-## Caching
-
-## Throttling
-
-## Signals
-
 -   users app
     -   After create market, update user role to seller
     -   After delete market, update user role to buyer
     -   After create user, create cart object
-
-## Exceptions & Validations
-
-> Enure Consistency, Integrity ...
-
--   Model level vlidations
-    -   Secure DB level
--   Serializer level validations
-    -   Check valid data before go to db
--   Create Endpoints exceptions
-    -   Permissions
-
-## Authentication/Authorization
-
--   Use basic setup of jwt
--   Setup permessions for each role
-    -   Any - Buier - Seller - Admin
