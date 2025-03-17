@@ -110,6 +110,8 @@ class Payment(models.Model):
         PENDING = "pending", "Pending"
         COMPLETED = "completed", "Completed"
         FAILED = "failed", "Failed"
+        REFUNDING = "refunding", "Refunding"
+        REFUNDED = "refunded", "Refunded"
 
     # Default fields
     payment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
