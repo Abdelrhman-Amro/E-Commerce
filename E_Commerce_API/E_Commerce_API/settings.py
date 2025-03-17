@@ -191,3 +191,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 # note: Set to False to remove trailing slashes from URLs
 # note: And if it is exists cause NotFound rather than InternalServerError
 APPEND_SLASH = False
+
+# Payment
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")

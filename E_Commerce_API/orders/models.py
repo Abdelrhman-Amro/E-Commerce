@@ -3,18 +3,16 @@ import uuid
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import Sum
 
 
 class Order(models.Model):
     # Status choices
     class Status(models.TextChoices):
         PENDING = "pending", "Pending"
-        PROCESSING = "processing", "Processing"
+        PREPARING = "preparing", "Preparing"
         SHIPPED = "shipped", "Shipped"
         DELIVERED = "delivered", "Delivered"
         CANCELLED = "cancelled", "Cancelled"
-        RETURNED = "returned", "Returned"
 
     # Default fields
     order_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -27,10 +25,22 @@ class Order(models.Model):
 
     # Required fields
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING, null=False, blank=False)
-    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00, editable=False)
+    total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.01)
 
     def __str__(self):
         return f"Order {self.order_id} - {self.user.username}"
+
+    def clean(self):
+
+        if self.shipping_address.user != self.user:
+            raise ValidationError("Shipping address doesn't belong to the user")
+
+    def save(self, *args, **kwargs):
+        """
+        Ensure cleaning before saving
+        """
+        self.clean()
+        super().save(*args, **kwargs)
 
     class Meta:
         db_table = "order"
@@ -52,7 +62,6 @@ class OrderItem(models.Model):
     # Relationships
     order = models.ForeignKey("Order", on_delete=models.CASCADE, related_name="order_items")
     product = models.ForeignKey("products.Product", on_delete=models.PROTECT, related_name="order_items")
-    store = models.ForeignKey("users.Store", on_delete=models.PROTECT, related_name="order_items")
 
     # Required fields
     order_item_quantity = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(9999)])
@@ -62,7 +71,6 @@ class OrderItem(models.Model):
         """
         Validate order items
         """
-
         # Extra check stock availability
         if self.order_item_quantity > self.product.stock_quantity:
             raise ValidationError(f"Quantity ({self.order_item_quantity}) exceeds available stock quatity ({self.product.stock_quantity})")
@@ -70,10 +78,6 @@ class OrderItem(models.Model):
         # Ensure unit_price matches product price at order time
         if self.unit_price != self.product.price:
             raise ValidationError(f"Unit price ({self.unit_price}) doesn't match product price ({self.product.price})")
-
-        # Ensure product belongs to the store
-        if self.product.store_id != self.store:
-            raise ValidationError("Product does not belong to the specified store")
 
     def save(self, *args, **kwargs):
         """
@@ -93,7 +97,6 @@ class OrderItem(models.Model):
         indexes = [
             models.Index(fields=["order"]),
             models.Index(fields=["product"]),
-            models.Index(fields=["store"]),
         ]
         constraints = [
             models.CheckConstraint(check=models.Q(order_item_quantity__gte=1), name="order_item_quantity_gte_1"),
@@ -107,7 +110,6 @@ class Payment(models.Model):
         PENDING = "pending", "Pending"
         COMPLETED = "completed", "Completed"
         FAILED = "failed", "Failed"
-        REFUNDED = "refunded", "Refunded"
 
     # Default fields
     payment_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -120,7 +122,6 @@ class Payment(models.Model):
     # Required fields
     amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)])
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
-    payment_method = models.CharField(max_length=50)
 
     def clean(self):
         """Validate payment"""

@@ -19,6 +19,12 @@ class Cart(models.Model):
         related_name="carts",
     )
 
+    def total_amount(self):
+        """
+        Calculate total amount of cart items
+        """
+        return sum([item.product.price * item.cart_item_quantity for item in self.items.all()])
+
     def __str__(self):
         return f"Cart {self.cart_id} for {self.user.username}"
 
@@ -43,6 +49,12 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f"{self.cart_item_quantity} x {self.product.name} in Cart {self.cart.cart_id}"
+
+    def item_total_price(self):
+        """
+        Calculate total price of cart item
+        """
+        return self.product.price * self.cart_item_quantity
 
     def clean(self):
         """
