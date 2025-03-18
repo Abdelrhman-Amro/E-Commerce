@@ -5,6 +5,9 @@ from .models import Cart, CartItem
 
 class CartAdmin(admin.ModelAdmin):
     readonly_fields = ("cart_id", "created_at", "updated_at")
+    list_diplay = ("cart_id", "user__username", "total_amount", "created_at", "updated_at")
+    ordering = ("updated_at", "created_at")
+    search_fields = ("user__username",)
 
 
 class CartItemAdmin(admin.ModelAdmin):

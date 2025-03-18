@@ -27,7 +27,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class ReviewAdmin(admin.ModelAdmin):
     readonly_fields = ("review_id", "created_at", "updated_at")
-    list_display = ("rating", "product_id__name", "reviewer__username", "created_at")
+    list_display = ("rating", "product__name", "reviewer__username", "created_at")
     list_filter = ("rating", "product_id", "reviewer")
     search_fields = ("comment_title", "comment")
     ordering = ("rating", "created_at")
