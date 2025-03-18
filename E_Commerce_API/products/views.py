@@ -1,13 +1,13 @@
-# from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
-
-# from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from users.models import Store
 from users.permissions import IsSeller
 
+from .filters import ProductFilter
 from .models import Category, Product, Review
 from .serializers import (
     CategorySerializer,
@@ -16,8 +16,6 @@ from .serializers import (
     ReviewSerializer,
     StoreProductSerializer,
 )
-
-# from .pagination import ProductPagination
 
 CustomUser = get_user_model()
 
@@ -34,6 +32,9 @@ class CategoryViewSet(viewsets.ModelViewSet):
 
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ["name"]
+    ordering_fields = ["name"]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
@@ -52,6 +53,10 @@ class StoreProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = StoreProductSerializer
     permission_classes = [IsAuthenticated, IsSeller]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ["name", "quick_overview"]
+    ordering_fields = ["price"]
 
     def get_queryset(self):
         store_id = Store.objects.get(user=self.request.user)
@@ -71,11 +76,10 @@ class ProductListView(ListAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductListSerializer
     permission_classes = [AllowAny]
-    # filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
-    # filterset_class = ProductFilter
-    # search_fields = ["name", "description"]
-    # ordering_fields = ["price", "created_at"]
-    # pagination_class = ProductPagination
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    filterset_class = ProductFilter
+    search_fields = ["name", "quick_overview", "store_id__store_name"]
+    ordering_fields = ["price"]
 
 
 class ProductRetrieveView(RetrieveAPIView):
@@ -87,7 +91,6 @@ class ProductRetrieveView(RetrieveAPIView):
     queryset = Product.objects.all()
     serializer_class = ProductRetrieveSerializer
     permission_classes = [AllowAny]
-    # filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
 
 
 #############################################################
@@ -95,6 +98,9 @@ class ProductRetrieveView(RetrieveAPIView):
 class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filterset_fields = ["rating", "is_verified_purchase"]
+    ordering_fields = ["created_at"]
 
     def get_permissions(self):
         if self.action in ["create", "update", "partial_update", "delete"]:

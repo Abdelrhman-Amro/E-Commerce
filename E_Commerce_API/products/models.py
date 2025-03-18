@@ -86,6 +86,7 @@ class Review(models.Model):
         verbose_name = "review"
         verbose_name_plural = "reviews"
 
+        ordering = ("-created_at",)
         unique_together = [("product", "reviewer")]  # Ensure a user can only review a product once
         constraints = [
             models.CheckConstraint(check=models.Q(rating__gte=1) & models.Q(rating__lte=5), name="rating_range_1_to_5"),

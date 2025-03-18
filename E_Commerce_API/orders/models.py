@@ -46,6 +46,7 @@ class Order(models.Model):
         db_table = "order"
         verbose_name = "order"
         verbose_name_plural = "orders"
+        ordering = ["-updated_at"]
         indexes = [
             models.Index(fields=["user"]),
             models.Index(fields=["status"]),
@@ -93,6 +94,7 @@ class OrderItem(models.Model):
         db_table = "order_item"
         verbose_name = "order item"
         verbose_name_plural = "order items"
+        ordering = ("-created_at",)
         unique_together = [("order", "product")]
         indexes = [
             models.Index(fields=["order"]),
@@ -137,6 +139,7 @@ class Payment(models.Model):
         db_table = "payment"
         verbose_name = "payment"
         verbose_name_plural = "payments"
+        ordering = ["-updated_at"]
         indexes = [
             models.Index(fields=["order"]),
             models.Index(fields=["status"]),

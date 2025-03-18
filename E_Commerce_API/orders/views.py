@@ -4,6 +4,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, views, viewsets
 from rest_framework.decorators import (
     action,
@@ -167,26 +168,44 @@ class OrderListView(generics.ListAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["status"]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
 
 
-# Order Update and Retrieve
-class OrderRetrieveView(generics.RetrieveAPIView):
-    queryset = OrderItem.objects.all()
-    serializer_class = OrderItemSerializer
-    permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        order_id = self.kwargs.get("order_id")
-        return OrderItem.objects.filter(order_id=order_id)
-
-
-class OrderViewSet(viewsets.ModelViewSet):
+class OrderUpdateView(generics.UpdateAPIView):
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+
+
+class OrderItemListView(generics.ListAPIView):
+    queryset = OrderItem.objects.all()
+    serializer_class = OrderItemSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        order_id = self.kwargs.get("pk")
+        order = get_object_or_404(Order, order_id=order_id)
+        if order.user != self.request.user:
+            self.permission_denied(self.request)
+
+        return OrderItem.objects.filter(order=order_id)
+
+
+##############################################################
+#################### Payment Endpoints #######################
+class PaymentListView(generics.ListAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+    permission_classes = [IsAuthenticated]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ["status"]
+
+    def get_queryset(self):
+        return Payment.objects.filter(order__user=self.request.user)

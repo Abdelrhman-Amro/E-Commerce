@@ -74,6 +74,7 @@ class CartItem(models.Model):
         db_table = "cart_item"
         verbose_name = "cart item"
         verbose_name_plural = "cart items"
+        ordering = ["-created_at"]
         unique_together = [("cart", "product")]
         indexes = [
             models.Index(fields=["cart"]),

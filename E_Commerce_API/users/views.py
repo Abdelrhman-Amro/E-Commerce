@@ -1,7 +1,9 @@
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, serializers, status, viewsets
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.generics import CreateAPIView, RetrieveUpdateDestroyAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -75,6 +77,8 @@ class StoreViewSet(viewsets.ModelViewSet):
     queryset = Store.objects.all()
     serializer_class = StoreSerializer
     permission_classes = [IsAuthenticated, IsSeller]
+    filter_backends = [SearchFilter]
+    search_fields = ["store_name", "description"]
 
     def get_permissions(self):
         if self.action == "list":
@@ -122,6 +126,8 @@ class AddressViewSet(viewsets.ModelViewSet):
 
     serializer_class = AddressSerializer
     permission_classes = [IsAuthenticated]
+    filter_backends = [OrderingFilter]
+    ordering_fields = ["updated_at"]
 
     def get_queryset(self):
         """Return only addresses belonging to the current user"""
@@ -150,6 +156,8 @@ class StoreAddressViewSet(viewsets.ModelViewSet):
 
     # list++ retrieve++
     serializer_class = AddressSerializer
+    filter_backends = [SearchFilter]
+    search_fields = ["city", "country"]
 
     def get_permissions(self):
         if self.action in ["list", "retrieve"]:
